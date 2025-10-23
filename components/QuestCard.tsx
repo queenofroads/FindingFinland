@@ -244,7 +244,7 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
         >
           <p className="text-sm text-green-700 font-semibold flex items-center gap-2">
             <span>🎉</span>
-            Completed on {new Date(progress.completed_at).toLocaleDateString()}
+            Completed on {new Date(progress.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
           {progress.notes && (
             <p className="text-sm text-gray-600 mt-2">

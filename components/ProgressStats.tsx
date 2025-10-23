@@ -2,7 +2,7 @@
 
 import { Profile } from '@/types/database'
 import { motion } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 
 interface ProgressStatsProps {
   profile: Profile
@@ -14,9 +14,29 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
   const progressPercentage = totalQuests > 0 ? (completedQuests / totalQuests) * 100 : 0
   const [animatedPoints, setAnimatedPoints] = useState(0)
   const [animatedProgress, setAnimatedProgress] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Generate fixed particle positions (stable across renders)
+  const particlePositions = useMemo(() => {
+    return Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      x: [Math.sin(i * 0.5) * 200, Math.cos(i * 0.5) * 200],
+      y: [Math.cos(i * 0.5) * 100, Math.sin(i * 0.5) * 100],
+      left: 10 + (i * 4.5) % 90,
+      top: 10 + ((i * 7) % 80),
+      duration: 3 + (i % 3),
+      delay: (i % 4) * 0.5,
+    }))
+  }, [])
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Animate points counter
   useEffect(() => {
+    if (!isMounted) return
+
     const duration = 1500
     const steps = 60
     const increment = profile.total_points / steps
@@ -33,10 +53,12 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
     }, duration / steps)
 
     return () => clearInterval(timer)
-  }, [profile.total_points])
+  }, [profile.total_points, isMounted])
 
   // Animate progress bar
   useEffect(() => {
+    if (!isMounted) return
+
     const duration = 1000
     const steps = 50
     const increment = progressPercentage / steps
@@ -53,7 +75,7 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
     }, duration / steps)
 
     return () => clearInterval(timer)
-  }, [progressPercentage])
+  }, [progressPercentage, isMounted])
 
   const getLevelEmoji = (level: number) => {
     if (level === 1) return '🌱'
@@ -71,6 +93,29 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
     return "Your Finnish adventure begins! ✨"
   }
 
+  if (!isMounted) {
+    // Return non-animated version for SSR
+    return (
+      <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl p-8 text-white shadow-2xl">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-bold mb-1">
+              {profile.full_name || 'Adventurer'}
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">{getLevelEmoji(profile.level)}</span>
+              <p className="text-blue-100 font-semibold">Level {profile.level}</p>
+            </div>
+          </div>
+          <div className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+            <div className="text-4xl font-bold">{profile.total_points}</div>
+            <div className="text-blue-100 text-sm mt-1">Total Points</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -79,24 +124,24 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
       className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden"
     >
       {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {particlePositions.map((particle) => (
           <motion.div
-            key={i}
+            key={particle.id}
             className="absolute w-2 h-2 bg-white/20 rounded-full"
             animate={{
-              x: [Math.random() * 400, Math.random() * 400],
-              y: [Math.random() * 200, Math.random() * 200],
+              x: particle.x,
+              y: particle.y,
               scale: [0, 1, 0],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: particle.duration,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: particle.delay,
             }}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${particle.left}%`,
+              top: `${particle.top}%`,
             }}
           />
         ))}
@@ -200,7 +245,7 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
               <p className="text-sm text-blue-100 flex items-center gap-2">
                 <span className="text-xl">📅</span>
                 <span>
-                  In Finland since {new Date(profile.arrival_date).toLocaleDateString()}
+                  In Finland since {new Date(profile.arrival_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </span>
               </p>
             </motion.div>
