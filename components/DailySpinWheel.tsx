@@ -79,10 +79,20 @@ export default function DailySpinWheel({ userId, lastSpinDate, onSpinComplete }:
 
         // Update user XP if reward is XP
         if (randomReward.type === 'xp') {
+          // First get current XP
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_xp')
+            .eq('id', userId)
+            .single()
+
+          const newXP = (profile?.total_xp || 0) + randomReward.value
+
+          // Then update with new total
           await supabase
             .from('profiles')
             .update({
-              total_xp: supabase.raw(`total_xp + ${randomReward.value}`),
+              total_xp: newXP,
               daily_spin_last_used: today
             })
             .eq('id', userId)
