@@ -77,6 +77,7 @@ export default function SignupPage() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="John Doe"
+                suppressHydrationWarning
               />
             </div>
 
@@ -92,6 +93,7 @@ export default function SignupPage() {
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="your.email@example.com"
+                suppressHydrationWarning
               />
             </div>
 
@@ -108,6 +110,7 @@ export default function SignupPage() {
                 minLength={6}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
+                suppressHydrationWarning
               />
               <p className="mt-1 text-sm text-gray-500">At least 6 characters</p>
             </div>

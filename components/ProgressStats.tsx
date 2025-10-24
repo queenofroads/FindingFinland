@@ -107,9 +107,17 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
               <p className="text-blue-100 font-semibold">Level {profile.level}</p>
             </div>
           </div>
-          <div className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-            <div className="text-4xl font-bold">{profile.total_points}</div>
-            <div className="text-blue-100 text-sm mt-1">Total Points</div>
+          <div className="text-right">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 mb-2">
+              <div className="text-4xl font-bold">{profile.total_points}</div>
+              <div className="text-blue-100 text-sm mt-1">Points</div>
+            </div>
+            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-4 border-2 border-cyan-300 shadow-lg">
+              <div className="text-3xl font-bold flex items-center gap-1">
+                <span>⚡</span>{profile.total_xp || 0}
+              </div>
+              <div className="text-cyan-100 text-sm mt-1">Total XP</div>
+            </div>
           </div>
         </div>
       </div>
@@ -171,17 +179,30 @@ export default function ProgressStats({ profile, completedQuests, totalQuests }:
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-            className="text-right bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20"
+            className="text-right"
           >
-            <motion.div
-              key={animatedPoints}
-              initial={{ scale: 1.2 }}
-              animate={{ scale: 1 }}
-              className="text-4xl font-bold"
-            >
-              {animatedPoints}
-            </motion.div>
-            <div className="text-blue-100 text-sm mt-1">Total Points</div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20 mb-2">
+              <motion.div
+                key={animatedPoints}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                className="text-4xl font-bold"
+              >
+                {animatedPoints}
+              </motion.div>
+              <div className="text-blue-100 text-sm mt-1">Points</div>
+            </div>
+            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-4 border-2 border-cyan-300 shadow-lg">
+              <motion.div
+                key={profile.total_xp}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                className="text-3xl font-bold flex items-center gap-1"
+              >
+                <span>⚡</span>{profile.total_xp || 0}
+              </motion.div>
+              <div className="text-cyan-100 text-sm mt-1">Total XP</div>
+            </div>
           </motion.div>
         </div>
 

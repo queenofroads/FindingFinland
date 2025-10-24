@@ -58,6 +58,8 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
     })
   }
 
+  const [showQuote, setShowQuote] = useState(false)
+
   const handleComplete = async () => {
     if (isCompleted) return
 
@@ -68,6 +70,12 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
       triggerConfetti()
       setShowDetails(false)
       setNotes('')
+
+      // Show completion quote if available
+      if (quest.completion_quote) {
+        setTimeout(() => setShowQuote(true), 1500)
+        setTimeout(() => setShowQuote(false), 6000)
+      }
 
       // Reset animation after 3 seconds
       setTimeout(() => setJustCompleted(false), 3000)
@@ -136,13 +144,31 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
             </motion.span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* XP Badge */}
           <motion.span
-            whileHover={{ scale: 1.1 }}
-            className="bg-yellow-100 text-yellow-800 font-bold px-3 py-1 rounded-full text-sm shadow-sm"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold px-3 py-1 rounded-full text-sm shadow-md flex items-center gap-1"
           >
-            +{quest.points} pts
+            <span>⚡</span> +{quest.xp} XP
           </motion.span>
+          {/* Points Badge */}
+          <motion.span
+            whileHover={{ scale: 1.1, rotate: -5 }}
+            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-full text-sm shadow-md flex items-center gap-1"
+          >
+            <span>🏆</span> +{quest.points}
+          </motion.span>
+          {/* Featured badge */}
+          {quest.is_featured && (
+            <motion.span
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="bg-gradient-to-r from-pink-400 to-rose-500 text-white font-bold px-2 py-1 rounded-full text-xs shadow-md"
+            >
+              ⭐ Featured
+            </motion.span>
+          )}
           {isCompleted && (
             <motion.span
               initial={{ scale: 0, rotate: -180 }}
@@ -155,7 +181,20 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
         </div>
       </div>
 
-      <p className="text-gray-700 mb-4">{quest.description}</p>
+      <p className="text-gray-700 mb-3">{quest.description}</p>
+
+      {/* Region Tag */}
+      {quest.region && !isCompleted && (
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-2 mb-4"
+        >
+          <span className="text-sm text-gray-600 bg-white/60 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1">
+            <span>📍</span> {quest.region}
+          </span>
+        </motion.div>
+      )}
 
       {!isCompleted && (
         <motion.button
@@ -275,6 +314,26 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
           </motion.div>
         </motion.div>
       )}
+
+      {/* Completion Quote Popup */}
+      <AnimatePresence>
+        {showQuote && quest.completion_quote && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+            className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-11/12 z-10"
+          >
+            <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-white">
+              <p className="text-center font-semibold text-sm">
+                💬 {quest.completion_quote}
+              </p>
+            </div>
+            {/* Speech bubble arrow */}
+            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-blue-600" />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

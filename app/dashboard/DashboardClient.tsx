@@ -1,12 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Quest, UserQuestProgress, Profile, QuestCategory } from '@/types/database'
+import { Quest, UserQuestProgress, Profile, QuestCategory, Badge, UserBadge } from '@/types/database'
 import QuestCard from '@/components/QuestCard'
 import ProgressStats from '@/components/ProgressStats'
+import XPProgressBar from '@/components/XPProgressBar'
+import BadgesDisplay from '@/components/BadgesDisplay'
+import DailySpinWheel from '@/components/DailySpinWheel'
+import BadgeUnlockNotification from '@/components/BadgeUnlockNotification'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 interface DashboardClientProps {
   profile: Profile
@@ -18,8 +23,49 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
   const [profile, setProfile] = useState(initialProfile)
   const [progress, setProgress] = useState(initialProgress)
   const [selectedCategory, setSelectedCategory] = useState<QuestCategory | 'all'>('all')
+  const [badges, setBadges] = useState<Badge[]>([])
+  const [userBadges, setUserBadges] = useState<UserBadge[]>([])
+  const [unlockedBadge, setUnlockedBadge] = useState<Badge | null>(null)
+  const [recentXPGain, setRecentXPGain] = useState(0)
+  const [showBadges, setShowBadges] = useState(false)
+  const [showSpin, setShowSpin] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  // Fetch badges and user badges
+  useEffect(() => {
+    fetchBadgesData()
+  }, [])
+
+  const fetchBadgesData = async () => {
+    // Fetch all badges
+    const { data: badgesData } = await supabase
+      .from('badges')
+      .select('*')
+      .order('rarity')
+
+    if (badgesData) setBadges(badgesData)
+
+    // Fetch user's badges
+    const { data: userBadgesData } = await supabase
+      .from('user_badges')
+      .select('*')
+      .eq('user_id', profile.id)
+
+    if (userBadgesData) setUserBadges(userBadgesData)
+  }
+
+  const refreshProfile = async () => {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', profile.id)
+      .single()
+
+    if (profileData) {
+      setProfile(profileData)
+    }
+  }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -32,7 +78,7 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
       const quest = quests.find((q) => q.id === questId)
       if (!quest) return
 
-      // Insert or update progress
+      // Insert or update progress (XP is handled automatically by database trigger)
       const { error: progressError } = await supabase
         .from('user_quest_progress')
         .upsert({
@@ -45,7 +91,7 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
 
       if (progressError) throw progressError
 
-      // Update user's total points
+      // Update user's total points (XP is updated by trigger)
       const newTotalPoints = profile.total_points + quest.points
       const { error: profileError } = await supabase
         .from('profiles')
@@ -54,15 +100,34 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
 
       if (profileError) throw profileError
 
-      // Update local state
-      setProfile({ ...profile, total_points: newTotalPoints })
+      // Show XP gain animation
+      setRecentXPGain(quest.xp)
+      setTimeout(() => setRecentXPGain(0), 3000)
 
+      // Check for badge unlocks
+      const { data: newBadges, error: badgeError } = await supabase
+        .rpc('check_and_unlock_badges', { p_user_id: profile.id })
+
+      if (!badgeError && newBadges && newBadges.length > 0) {
+        // Show first unlocked badge
+        const badge = badges.find(b => b.id === newBadges[0].badge_id)
+        if (badge) {
+          setTimeout(() => setUnlockedBadge(badge), 2000)
+        }
+        // Refresh badges data
+        fetchBadgesData()
+      }
+
+      // Refresh profile to get updated XP and level
+      await refreshProfile()
+
+      // Update local state
       const existingProgress = progress.find((p) => p.quest_id === questId)
       if (existingProgress) {
         setProgress(
           progress.map((p) =>
             p.quest_id === questId
-              ? { ...p, completed: true, completed_at: new Date().toISOString(), notes: notes || null }
+              ? { ...p, completed: true, completed_at: new Date().toISOString(), notes: notes || null, xp_earned: quest.xp }
               : p
           )
         )
@@ -76,6 +141,7 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
             completed: true,
             completed_at: new Date().toISOString(),
             notes: notes || null,
+            xp_earned: quest.xp,
             created_at: new Date().toISOString(),
           },
         ])
@@ -126,36 +192,111 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Progress Stats */}
-        <div className="mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <ProgressStats
             profile={profile}
             completedQuests={completedQuests}
             totalQuests={totalQuests}
           />
-        </div>
+        </motion.div>
+
+        {/* XP Progress Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <XPProgressBar profile={profile} recentXPGain={recentXPGain} />
+        </motion.div>
+
+        {/* Quick Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex gap-4"
+        >
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowBadges(!showBadges)}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold shadow-lg flex items-center gap-2"
+          >
+            <span>🏆</span> {showBadges ? 'Hide' : 'Show'} Badges ({userBadges.length}/{badges.length})
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setShowSpin(!showSpin)}
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold shadow-lg flex items-center gap-2"
+          >
+            <span>🎡</span> {showSpin ? 'Hide' : 'Show'} Daily Spin
+          </motion.button>
+        </motion.div>
+
+        {/* Badges Display */}
+        {showBadges && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <BadgesDisplay badges={badges} userBadges={userBadges} />
+          </motion.div>
+        )}
+
+        {/* Daily Spin Wheel */}
+        {showSpin && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <DailySpinWheel
+              userId={profile.id}
+              lastSpinDate={profile.daily_spin_last_used}
+              onSpinComplete={(xpGained) => {
+                setRecentXPGain(xpGained)
+                refreshProfile()
+                setTimeout(() => setRecentXPGain(0), 3000)
+              }}
+            />
+          </motion.div>
+        )}
 
         {/* Category Filter */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Choose Your Quest</h2>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span>🎯</span> Your Quests
+          </h2>
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
-              <button
+              <motion.button
                 key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
                 className={`px-6 py-3 rounded-xl font-semibold transition ${
                   selectedCategory === category.id
-                    ? 'bg-blue-600 text-white shadow-lg scale-105'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
                 }`}
               >
                 <span className="mr-2">{category.icon}</span>
                 {category.name}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* Quests Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
@@ -177,6 +318,12 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
             <p className="text-gray-500 text-lg">No quests in this category yet.</p>
           </div>
         )}
+
+        {/* Badge Unlock Notification */}
+        <BadgeUnlockNotification
+          badge={unlockedBadge}
+          onClose={() => setUnlockedBadge(null)}
+        />
       </div>
     </div>
   )
