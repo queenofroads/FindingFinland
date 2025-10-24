@@ -268,3 +268,4 @@ Future features to consider:
 ---
 
 **Made with ❤️ for new immigrants in Finland**
+
