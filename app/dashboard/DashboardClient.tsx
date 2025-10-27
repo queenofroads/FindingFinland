@@ -168,9 +168,39 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
   const totalQuests = quests.length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+            x: [0, 100, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [90, 0, 90],
+            x: [0, -100, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-br from-pink-400/10 to-orange-400/10 rounded-full blur-3xl"
+        />
+      </div>
+
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-lg relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-bold text-blue-600">Finding Finland</h1>
@@ -192,7 +222,7 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Progress Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -274,25 +304,52 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="space-y-4"
         >
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span>🎯</span> Your Quests
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <motion.span
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                🎯
+              </motion.span>
+              Your Quest Journey
+            </h2>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-2xl font-bold shadow-lg"
+            >
+              {filteredQuests.length} {filteredQuests.length === 1 ? 'Quest' : 'Quests'}
+            </motion.div>
+          </div>
+
           <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
+            {categories.map((category, index) => (
               <motion.button
                 key={category.id}
-                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 * index }}
+                whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-xl font-semibold transition ${
+                className={`relative px-6 py-3 rounded-2xl font-bold transition-all duration-300 ${
                   selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-200'
+                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30'
+                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-gray-300 shadow-md'
                 }`}
               >
-                <span className="mr-2">{category.icon}</span>
-                {category.name}
+                <span className="text-xl mr-2">{category.icon}</span>
+                <span>{category.name}</span>
+                {selectedCategory === category.id && (
+                  <motion.div
+                    layoutId="activeCategory"
+                    className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl -z-10"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
               </motion.button>
             ))}
           </div>
@@ -314,9 +371,21 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </div>
 
         {filteredQuests.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No quests in this category yet.</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16"
+          >
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-8xl mb-6"
+            >
+              🔍
+            </motion.div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">No Quests Found</h3>
+            <p className="text-gray-600 text-lg">Try selecting a different category to see more adventures!</p>
+          </motion.div>
         )}
 
         {/* Badge Unlock Notification */}

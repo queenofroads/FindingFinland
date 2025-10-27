@@ -86,254 +86,344 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
     }
   }
 
-  const categoryColors = {
-    legal: 'bg-blue-50 border-blue-200 text-blue-700',
-    social: 'bg-purple-50 border-purple-200 text-purple-700',
-    cultural: 'bg-pink-50 border-pink-200 text-pink-700',
-    food: 'bg-orange-50 border-orange-200 text-orange-700',
+  const categoryConfig = {
+    legal: {
+      gradient: 'from-blue-500 via-blue-600 to-indigo-600',
+      light: 'from-blue-50 to-indigo-50',
+      accent: 'bg-blue-500',
+      border: 'border-blue-200',
+      shadow: 'shadow-blue-200/50',
+      glow: 'shadow-blue-500/20',
+      emoji: '⚖️'
+    },
+    social: {
+      gradient: 'from-purple-500 via-pink-500 to-rose-500',
+      light: 'from-purple-50 to-pink-50',
+      accent: 'bg-purple-500',
+      border: 'border-purple-200',
+      shadow: 'shadow-purple-200/50',
+      glow: 'shadow-purple-500/20',
+      emoji: '👥'
+    },
+    cultural: {
+      gradient: 'from-pink-500 via-rose-500 to-orange-500',
+      light: 'from-pink-50 to-orange-50',
+      accent: 'bg-pink-500',
+      border: 'border-pink-200',
+      shadow: 'shadow-pink-200/50',
+      glow: 'shadow-pink-500/20',
+      emoji: '🎭'
+    },
+    food: {
+      gradient: 'from-orange-500 via-amber-500 to-yellow-500',
+      light: 'from-orange-50 to-yellow-50',
+      accent: 'bg-orange-500',
+      border: 'border-orange-200',
+      shadow: 'shadow-orange-200/50',
+      glow: 'shadow-orange-500/20',
+      emoji: '🍴'
+    },
   }
 
-  const categoryHoverColors = {
-    legal: 'hover:border-blue-400 hover:shadow-lg hover:shadow-blue-100',
-    social: 'hover:border-purple-400 hover:shadow-lg hover:shadow-purple-100',
-    cultural: 'hover:border-pink-400 hover:shadow-lg hover:shadow-pink-100',
-    food: 'hover:border-orange-400 hover:shadow-lg hover:shadow-orange-100',
-  }
-
-  const categoryBadgeColors = {
-    legal: 'bg-blue-100 text-blue-800',
-    social: 'bg-purple-100 text-purple-800',
-    cultural: 'bg-pink-100 text-pink-800',
-    food: 'bg-orange-100 text-orange-800',
-  }
+  const config = categoryConfig[quest.category]
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={{ scale: isCompleted ? 1 : 1.02 }}
-      className={`rounded-xl p-6 border-2 transition-all cursor-pointer ${
+      layout
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
+      whileHover={!isCompleted ? { scale: 1.02, y: -4 } : {}}
+      className={`relative group rounded-3xl overflow-hidden ${
         isCompleted
-          ? 'bg-green-50 border-green-300'
-          : `${categoryColors[quest.category]} ${categoryHoverColors[quest.category]}`
-      } ${justCompleted ? 'animate-pulse' : ''}`}
+          ? 'bg-gradient-to-br from-emerald-50 to-teal-50'
+          : `bg-gradient-to-br ${config.light}`
+      }`}
     >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <motion.span
-            className="text-3xl"
-            animate={justCompleted ? {
-              scale: [1, 1.5, 1],
-              rotate: [0, 360, 360],
-            } : {}}
-            transition={{ duration: 0.6 }}
-          >
-            {quest.icon}
-          </motion.span>
-          <div>
-            <h3 className="font-bold text-lg text-gray-900">{quest.title}</h3>
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mt-1 ${
-                categoryBadgeColors[quest.category]
-              }`}
-            >
-              {quest.category.toUpperCase()}
-            </motion.span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* XP Badge */}
-          <motion.span
-            whileHover={{ scale: 1.1, rotate: 5 }}
-            className="bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold px-3 py-1 rounded-full text-sm shadow-md flex items-center gap-1"
-          >
-            <span>⚡</span> +{quest.xp} XP
-          </motion.span>
-          {/* Points Badge */}
-          <motion.span
-            whileHover={{ scale: 1.1, rotate: -5 }}
-            className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold px-3 py-1 rounded-full text-sm shadow-md flex items-center gap-1"
-          >
-            <span>🏆</span> +{quest.points}
-          </motion.span>
-          {/* Featured badge */}
-          {quest.is_featured && (
-            <motion.span
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="bg-gradient-to-r from-pink-400 to-rose-500 text-white font-bold px-2 py-1 rounded-full text-xs shadow-md"
-            >
-              ⭐ Featured
-            </motion.span>
-          )}
-          {isCompleted && (
-            <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              className="text-2xl"
-            >
-              ✅
-            </motion.span>
-          )}
-        </div>
+      {/* Animated background pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className={`absolute inset-0 bg-gradient-to-br ${config.gradient}`} />
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute -top-20 -right-20 w-40 h-40 bg-white/30 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [90, 0, 90],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute -bottom-20 -left-20 w-40 h-40 bg-white/20 rounded-full blur-3xl"
+        />
       </div>
 
-      <p className="text-gray-700 mb-3">{quest.description}</p>
+      {/* Content */}
+      <div className={`relative border-2 ${isCompleted ? 'border-emerald-300' : config.border} rounded-3xl p-6 backdrop-blur-sm transition-all duration-300 ${
+        !isCompleted && 'group-hover:shadow-2xl group-hover:' + config.glow
+      }`}>
 
-      {/* Region Tag */}
-      {quest.region && !isCompleted && (
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-2 mb-4"
-        >
-          <span className="text-sm text-gray-600 bg-white/60 px-3 py-1 rounded-full border border-gray-200 flex items-center gap-1">
-            <span>📍</span> {quest.region}
-          </span>
-        </motion.div>
-      )}
-
-      {!isCompleted && (
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setShowDetails(!showDetails)}
-          className="text-sm font-semibold text-blue-600 hover:text-blue-700 mb-2 flex items-center gap-1"
-        >
-          {showDetails ? '↑ Hide details' : '↓ Show details & complete quest'}
-        </motion.button>
-      )}
-
-      <AnimatePresence>
-        {showDetails && !isCompleted && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mt-4 pt-4 border-t border-gray-200 overflow-hidden"
-          >
-            {quest.tips && (
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white/50 rounded-lg p-3 mb-4 border border-yellow-200"
-              >
-                <p className="text-sm text-gray-700">
-                  <span className="font-semibold">💡 Tip: </span>
-                  {quest.tips}
-                </p>
-              </motion.div>
-            )}
-
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-4 flex-1">
+            {/* Icon */}
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="space-y-3"
+              whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+              transition={{ duration: 0.5 }}
+              className={`text-5xl bg-white rounded-2xl p-3 ${config.shadow} shadow-lg`}
             >
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  📝 Notes (optional)
-                </label>
-                <textarea
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Share your experience completing this quest..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                  rows={3}
-                />
-              </div>
+              {quest.icon}
+            </motion.div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={handleComplete}
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                    >
-                      ⭐
-                    </motion.span>
-                    Completing...
-                  </span>
-                ) : (
-                  '✨ Mark as Complete'
+            {/* Title and category */}
+            <div className="flex-1">
+              <h3 className="font-bold text-xl text-gray-900 mb-2 leading-tight">
+                {quest.title}
+              </h3>
+              <div className="flex items-center gap-2 flex-wrap">
+                <motion.span
+                  whileHover={{ scale: 1.05 }}
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${config.gradient} shadow-md`}
+                >
+                  <span>{config.emoji}</span>
+                  {quest.category.toUpperCase()}
+                </motion.span>
+                {quest.is_featured && (
+                  <motion.span
+                    animate={{
+                      scale: [1, 1.1, 1],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 text-white shadow-md"
+                  >
+                    ⭐ FEATURED
+                  </motion.span>
                 )}
-              </motion.button>
+              </div>
+            </div>
+          </div>
+
+          {/* Badges */}
+          <div className="flex flex-col gap-2">
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              className="bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2"
+            >
+              <span className="text-lg">⚡</span>
+              <span>+{quest.xp} XP</span>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: -5 }}
+              className="bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-orange-500/30 flex items-center gap-2"
+            >
+              <span className="text-lg">🏆</span>
+              <span>+{quest.points}</span>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Description */}
+        <p className="text-gray-700 mb-4 leading-relaxed">{quest.description}</p>
+
+        {/* Region Tag */}
+        {quest.region && !isCompleted && (
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2 mb-4"
+          >
+            <span className="inline-flex items-center gap-2 text-sm text-gray-700 bg-white/80 px-4 py-2 rounded-full border-2 border-gray-200 shadow-sm font-medium backdrop-blur-sm">
+              <span className="text-lg">📍</span>
+              {quest.region}
+            </span>
+          </motion.div>
+        )}
+
+        {/* Action Button */}
+        {!isCompleted && (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setShowDetails(!showDetails)}
+            className={`w-full text-sm font-bold py-3 px-4 rounded-2xl bg-gradient-to-r ${config.gradient} text-white shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2`}
+          >
+            {showDetails ? (
+              <>
+                <span>↑</span> Hide Details
+              </>
+            ) : (
+              <>
+                <span>🎯</span> Start Quest
+              </>
+            )}
+          </motion.button>
+        )}
+
+        {/* Completed Badge */}
+        {isCompleted && (
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-4 px-6 rounded-2xl shadow-lg"
+          >
+            <span className="text-2xl">✅</span>
+            <span>COMPLETED!</span>
+          </motion.div>
+        )}
+
+        {/* Details Panel */}
+        <AnimatePresence>
+          {showDetails && !isCompleted && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-6 pt-6 border-t-2 border-gray-200 space-y-4">
+                {quest.tips && (
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl p-4 border-2 border-yellow-200"
+                  >
+                    <p className="text-sm text-gray-800 flex items-start gap-2">
+                      <span className="text-xl">💡</span>
+                      <span><span className="font-bold">Pro Tip:</span> {quest.tips}</span>
+                    </p>
+                  </motion.div>
+                )}
+
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="space-y-3"
+                >
+                  <div>
+                    <label className="block text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                      <span className="text-lg">📝</span> Add Your Notes (optional)
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="How was your experience? Share your thoughts..."
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition resize-none bg-white/80 backdrop-blur-sm"
+                      rows={3}
+                    />
+                  </div>
+
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleComplete}
+                    disabled={loading}
+                    className={`w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-600 hover:via-teal-600 hover:to-cyan-600 text-white font-bold py-4 px-6 rounded-2xl transition shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base`}
+                  >
+                    {loading ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                          className="text-2xl"
+                        >
+                          ⭐
+                        </motion.span>
+                        Completing...
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-xl">✨</span>
+                        Mark as Complete
+                      </>
+                    )}
+                  </motion.button>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Completed Info */}
+        {isCompleted && progress?.completed_at && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-6 pt-6 border-t-2 border-emerald-300"
+          >
+            <p className="text-sm text-emerald-700 font-bold flex items-center gap-2 mb-2">
+              <span className="text-xl">🎉</span>
+              Completed on {new Date(progress.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </p>
+            {progress.notes && (
+              <div className="bg-white/80 rounded-2xl p-4 border-2 border-emerald-200">
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold">Your notes:</span> {progress.notes}
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Just Completed Overlay */}
+        {justCompleted && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-3xl z-10"
+          >
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                rotate: [0, 10, -10, 0]
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: 2,
+              }}
+              className="text-7xl"
+            >
+              🎉
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
 
-      {isCompleted && progress?.completed_at && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="mt-4 pt-4 border-t border-green-300"
-        >
-          <p className="text-sm text-green-700 font-semibold flex items-center gap-2">
-            <span>🎉</span>
-            Completed on {new Date(progress.completed_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-          {progress.notes && (
-            <p className="text-sm text-gray-600 mt-2">
-              <span className="font-semibold">Notes:</span> {progress.notes}
-            </p>
+        {/* Completion Quote Popup */}
+        <AnimatePresence>
+          {showQuote && quest.completion_quote && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -50, scale: 0.8 }}
+              className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-11/12 z-20"
+            >
+              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white px-6 py-4 rounded-3xl shadow-2xl border-4 border-white">
+                <p className="text-center font-bold text-sm flex items-center justify-center gap-2">
+                  <span className="text-xl">💬</span>
+                  {quest.completion_quote}
+                </p>
+              </div>
+              {/* Speech bubble arrow */}
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-blue-600" />
+            </motion.div>
           )}
-        </motion.div>
-      )}
-
-      {justCompleted && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl"
-        >
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 0.5,
-              repeat: 2,
-            }}
-            className="text-6xl"
-          >
-            🎉
-          </motion.div>
-        </motion.div>
-      )}
-
-      {/* Completion Quote Popup */}
-      <AnimatePresence>
-        {showQuote && quest.completion_quote && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: -20 }}
-            className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 w-11/12 z-10"
-          >
-            <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 text-white px-6 py-4 rounded-2xl shadow-2xl border-2 border-white">
-              <p className="text-center font-semibold text-sm">
-                💬 {quest.completion_quote}
-              </p>
-            </div>
-            {/* Speech bubble arrow */}
-            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-blue-600" />
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>
+      </div>
     </motion.div>
   )
 }
