@@ -214,39 +214,9 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
   const totalQuests = quests.length
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-            x: [0, 100, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-            x: [0, -100, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute bottom-20 left-20 w-96 h-96 bg-gradient-to-br from-pink-400/10 to-orange-400/10 rounded-full blur-3xl"
-        />
-      </div>
-
+    <div className="min-h-screen bg-gray-50 relative">
       {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50 shadow-lg relative">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-2xl font-bold text-blue-600">Finding Finland</h1>
@@ -268,92 +238,92 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </div>
       </nav>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Compact Stats Grid */}
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Welcome Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {profile.full_name || 'Adventurer'}! 👋</h1>
+          <p className="text-gray-600">Here's your Finnish adventure progress</p>
+        </div>
+
+        {/* Stats Grid - Clean Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-4 gap-6"
         >
-          {/* Profile Card */}
+          {/* Level Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -4 }}
-            className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-blue-200"
+            whileHover={{ y: -4 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all"
           >
-            <div className="flex items-center gap-4">
-              <div className="text-5xl bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-4 shadow-lg">
-                👤
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">{profile.full_name || 'Adventurer'}</h3>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-2xl">{profile.level >= 10 ? '👑' : profile.level >= 5 ? '⭐' : '🌱'}</span>
-                  <span className="text-sm font-bold text-blue-600">Level {profile.level}</span>
-                </div>
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Level</span>
+              <span className="text-3xl">{profile.level >= 10 ? '👑' : profile.level >= 5 ? '⭐' : '🌱'}</span>
             </div>
+            <div className="text-4xl font-bold text-gray-900">{profile.level}</div>
+            <p className="text-sm text-gray-500 mt-1">Current level</p>
           </motion.div>
 
           {/* XP Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -4 }}
-            className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl p-6 shadow-xl text-white"
+            whileHover={{ y: -4 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-cyan-100 font-semibold">Total Experience</p>
-                <h3 className="text-4xl font-bold mt-1">{profile.total_xp || 0}</h3>
-                <p className="text-xs text-cyan-100 mt-1">XP Points</p>
-              </div>
-              <div className="text-5xl">⚡</div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Experience</span>
+              <span className="text-3xl">⚡</span>
             </div>
+            <div className="text-4xl font-bold text-gray-900">{profile.total_xp || 0}</div>
+            <p className="text-sm text-gray-500 mt-1">Total XP earned</p>
           </motion.div>
 
-          {/* Quests Card */}
+          {/* Completed Card */}
           <motion.div
-            whileHover={{ scale: 1.02, y: -4 }}
-            className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl p-6 shadow-xl text-white"
+            whileHover={{ y: -4 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-100 font-semibold">Quest Progress</p>
-                <h3 className="text-4xl font-bold mt-1">{completedQuests}/{totalQuests}</h3>
-                <p className="text-xs text-purple-100 mt-1">{Math.round((completedQuests / totalQuests) * 100)}% Complete</p>
-              </div>
-              <div className="text-5xl">🎯</div>
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Completed</span>
+              <span className="text-3xl">✅</span>
             </div>
+            <div className="text-4xl font-bold text-gray-900">{completedQuests}</div>
+            <p className="text-sm text-gray-500 mt-1">Quests finished</p>
+          </motion.div>
+
+          {/* Progress Card */}
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all text-white"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-semibold uppercase tracking-wide text-white/80">Progress</span>
+              <span className="text-3xl">🎯</span>
+            </div>
+            <div className="text-4xl font-bold">{Math.round((completedQuests / totalQuests) * 100)}%</div>
+            <p className="text-sm text-white/80 mt-1">{completedQuests}/{totalQuests} quests</p>
           </motion.div>
         </motion.div>
 
-        {/* XP Progress Bar - Compact */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <XPProgressBar profile={profile} recentXPGain={recentXPGain} />
-        </motion.div>
-
-        {/* Quick Actions - Compact */}
+        {/* Quick Actions - Professional Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex flex-wrap gap-3"
+          className="flex flex-wrap gap-4"
         >
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowBadges(!showBadges)}
-            className="px-5 py-2.5 bg-white border-2 border-purple-300 hover:border-purple-500 text-purple-700 rounded-2xl font-bold shadow-md flex items-center gap-2 transition"
+            className="px-6 py-3 bg-white border border-gray-300 hover:border-gray-400 text-gray-700 rounded-lg font-semibold shadow-sm hover:shadow-md flex items-center gap-2 transition-all"
           >
-            <span>🏆</span> Badges ({userBadges.length}/{badges.length})
+            <span>🏆</span> View Badges <span className="text-sm text-gray-500">({userBadges.length}/{badges.length})</span>
           </motion.button>
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowSpin(!showSpin)}
-            className="px-5 py-2.5 bg-white border-2 border-blue-300 hover:border-blue-500 text-blue-700 rounded-2xl font-bold shadow-md flex items-center gap-2 transition"
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold shadow-sm hover:shadow-md flex items-center gap-2 transition-all"
           >
             <span>🎡</span> Daily Spin
           </motion.button>
@@ -389,182 +359,194 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
           </motion.div>
         )}
 
-        {/* Section Divider */}
-        <div className="relative py-8">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t-2 border-gray-200"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <span className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-6 py-2 text-2xl font-bold text-gray-800 rounded-full shadow-md border-2 border-gray-200">
-              ✨ Start Your Adventure ✨
-            </span>
-          </div>
-        </div>
-
-        {/* Category Filter - Cleaner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="space-y-6"
-        >
-          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border-2 border-gray-200">
-            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
-              <span>🎨</span> Choose Your Path
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category, index) => (
-                <motion.button
-                  key={category.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.05 * index }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
-                    selectedCategory === category.id
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  <span className="mr-2">{category.icon}</span>
-                  {category.name}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Quests by Level - Accordion Style */}
+        {/* Growth Dashboard */}
         <div className="space-y-6">
-          {(['beginner', 'intermediate', 'advanced'] as const).map((level, levelIndex) => {
-            const levelQuests = questsByLevel[level]
-            const config = levelConfig[level]
-            const completedInLevel = levelQuests.filter(q =>
-              progress.find(p => p.quest_id === q.id && p.completed)
-            ).length
+          {/* Section Title */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Growth Journey</h2>
+            <p className="text-gray-600">Track your progress and achievements</p>
+          </div>
 
-            if (levelQuests.length === 0) return null
+          {/* Activity Overview Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Category Progress Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span>📊</span> Progress by Category
+              </h3>
+              <div className="space-y-4">
+                {categories.filter(c => c.id !== 'all').map((category) => {
+                  const categoryQuests = quests.filter(q => q.category === category.id)
+                  const completedInCategory = categoryQuests.filter(q =>
+                    progress.find(p => p.quest_id === q.id && p.completed)
+                  ).length
+                  const percentage = categoryQuests.length > 0 ? (completedInCategory / categoryQuests.length) * 100 : 0
 
-            return (
-              <motion.div
-                key={level}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: levelIndex * 0.1 }}
-                className={`bg-gradient-to-br ${config.lightGradient} rounded-3xl border-2 border-gray-200 shadow-xl overflow-hidden`}
-              >
-                {/* Level Header - Clickable */}
-                <motion.button
-                  onClick={() => toggleLevel(level)}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                  className="w-full p-6 flex items-center justify-between cursor-pointer group"
-                >
-                  <div className="flex items-center gap-4">
-                    <motion.div
-                      animate={expandedLevels[level] ? { rotate: [0, -10, 10, -10, 0] } : {}}
-                      transition={{ duration: 0.5 }}
-                      className={`text-5xl bg-white rounded-2xl p-3 shadow-lg`}
-                    >
-                      {config.icon}
-                    </motion.div>
-                    <div className="text-left">
-                      <h3 className={`text-2xl font-bold ${config.color} flex items-center gap-2`}>
-                        {config.title}
-                        <span className={`text-sm px-3 py-1 rounded-full bg-gradient-to-r ${config.gradient} text-white`}>
-                          {completedInLevel}/{levelQuests.length}
+                  return (
+                    <div key={category.id}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <span>{category.icon}</span>
+                          {category.name}
                         </span>
-                      </h3>
-                      <p className="text-gray-600 text-sm mt-1">{config.description}</p>
+                        <span className="text-sm text-gray-600">{completedInCategory}/{categoryQuests.length}</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 0.8, delay: 0.2 }}
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )
+                })}
+              </div>
+            </motion.div>
 
-                  <motion.div
-                    animate={{ rotate: expandedLevels[level] ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="text-3xl"
-                  >
-                    ▼
-                  </motion.div>
-                </motion.button>
+            {/* Level Progress Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span>🎯</span> Quest Difficulty
+              </h3>
+              <div className="space-y-4">
+                {(['beginner', 'intermediate', 'advanced'] as const).map((level) => {
+                  const levelQuests = questsByLevel[level]
+                  const config = levelConfig[level]
+                  const completedInLevel = levelQuests.filter(q =>
+                    progress.find(p => p.quest_id === q.id && p.completed)
+                  ).length
+                  const percentage = levelQuests.length > 0 ? (completedInLevel / levelQuests.length) * 100 : 0
 
-                {/* Level Content - Collapsible */}
-                <AnimatePresence>
-                  {expandedLevels[level] && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-6">
-                        {/* Progress Bar */}
-                        <div className="mb-6">
-                          <div className="w-full bg-white/50 rounded-full h-3 overflow-hidden border-2 border-gray-200">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${(completedInLevel / levelQuests.length) * 100}%` }}
-                              transition={{ duration: 0.8 }}
-                              className={`h-full bg-gradient-to-r ${config.gradient} rounded-full`}
-                            />
-                          </div>
-                          <p className="text-sm text-gray-600 mt-2 text-center font-medium">
-                            {completedInLevel === levelQuests.length
-                              ? '🎉 Level Complete!'
-                              : `${levelQuests.length - completedInLevel} quests remaining`
-                            }
+                  return (
+                    <div key={level}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                          <span>{config.icon}</span>
+                          {config.title}
+                        </span>
+                        <span className="text-sm text-gray-600">{completedInLevel}/{levelQuests.length}</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 0.8, delay: 0.3 }}
+                          className={`h-full bg-gradient-to-r ${config.gradient} rounded-full`}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Recent Activity Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span>🏆</span> Recent Achievements
+              </h3>
+              <Link href="/quests" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
+                View All Quests →
+              </Link>
+            </div>
+
+            {progress.filter(p => p.completed).length > 0 ? (
+              <div className="space-y-3">
+                {progress
+                  .filter(p => p.completed)
+                  .sort((a, b) => new Date(b.completed_at || '').getTime() - new Date(a.completed_at || '').getTime())
+                  .slice(0, 5)
+                  .map((p) => {
+                    const quest = quests.find(q => q.id === p.quest_id)
+                    if (!quest) return null
+
+                    return (
+                      <motion.div
+                        key={p.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <span className="text-3xl">{quest.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-gray-900 truncate">{quest.title}</p>
+                          <p className="text-sm text-gray-500">
+                            Completed {new Date(p.completed_at || '').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </p>
                         </div>
-
-                        {/* Quests Grid */}
-                        <div className="grid gap-6 md:grid-cols-2">
-                          {levelQuests.map((quest, index) => {
-                            const questProgress = progress.find((p) => p.quest_id === quest.id)
-                            return (
-                              <motion.div
-                                key={quest.id}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.05 }}
-                              >
-                                <QuestCard
-                                  quest={quest}
-                                  progress={questProgress}
-                                  onComplete={handleCompleteQuest}
-                                />
-                              </motion.div>
-                            )
-                          })}
+                        <div className="flex items-center gap-2 text-sm font-bold">
+                          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">+{quest.xp} XP</span>
+                          <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full">+{quest.points} pts</span>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            )
-          })}
-        </div>
-
-        {filteredQuests.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-16"
-          >
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-8xl mb-6"
-            >
-              🔍
-            </motion.div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No Quests Found</h3>
-            <p className="text-gray-600 text-lg">Try selecting a different category to see more adventures!</p>
+                      </motion.div>
+                    )
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">🎯</div>
+                <p className="text-gray-600 font-medium">No quests completed yet!</p>
+                <p className="text-sm text-gray-500 mt-1">Start your first quest to begin your journey</p>
+                <Link href="/quests">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold shadow-sm hover:shadow-md"
+                  >
+                    Browse Quests
+                  </motion.button>
+                </Link>
+              </div>
+            )}
           </motion.div>
-        )}
+
+          {/* Achievement Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          >
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+              <div className="text-2xl mb-2">🌱</div>
+              <div className="text-2xl font-bold text-gray-900">{questsByLevel.beginner.filter(q => progress.find(p => p.quest_id === q.id && p.completed)).length}</div>
+              <p className="text-xs text-gray-600 font-medium">Beginner Quests</p>
+            </div>
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-200">
+              <div className="text-2xl mb-2">⭐</div>
+              <div className="text-2xl font-bold text-gray-900">{questsByLevel.intermediate.filter(q => progress.find(p => p.quest_id === q.id && p.completed)).length}</div>
+              <p className="text-xs text-gray-600 font-medium">Intermediate Quests</p>
+            </div>
+            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-4 border border-orange-200">
+              <div className="text-2xl mb-2">🔥</div>
+              <div className="text-2xl font-bold text-gray-900">{questsByLevel.advanced.filter(q => progress.find(p => p.quest_id === q.id && p.completed)).length}</div>
+              <p className="text-xs text-gray-600 font-medium">Advanced Quests</p>
+            </div>
+            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-4 border border-yellow-200">
+              <div className="text-2xl mb-2">🏆</div>
+              <div className="text-2xl font-bold text-gray-900">{userBadges.length}</div>
+              <p className="text-xs text-gray-600 font-medium">Badges Earned</p>
+            </div>
+          </motion.div>
+        </div>
 
         {/* Badge Unlock Notification */}
         <BadgeUnlockNotification
