@@ -269,19 +269,63 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
       </nav>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-        {/* Progress Stats */}
+        {/* Compact Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
-          <ProgressStats
-            profile={profile}
-            completedQuests={completedQuests}
-            totalQuests={totalQuests}
-          />
+          {/* Profile Card */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border-2 border-blue-200"
+          >
+            <div className="flex items-center gap-4">
+              <div className="text-5xl bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-4 shadow-lg">
+                👤
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">{profile.full_name || 'Adventurer'}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-2xl">{profile.level >= 10 ? '👑' : profile.level >= 5 ? '⭐' : '🌱'}</span>
+                  <span className="text-sm font-bold text-blue-600">Level {profile.level}</span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* XP Card */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl p-6 shadow-xl text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-cyan-100 font-semibold">Total Experience</p>
+                <h3 className="text-4xl font-bold mt-1">{profile.total_xp || 0}</h3>
+                <p className="text-xs text-cyan-100 mt-1">XP Points</p>
+              </div>
+              <div className="text-5xl">⚡</div>
+            </div>
+          </motion.div>
+
+          {/* Quests Card */}
+          <motion.div
+            whileHover={{ scale: 1.02, y: -4 }}
+            className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl p-6 shadow-xl text-white"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-purple-100 font-semibold">Quest Progress</p>
+                <h3 className="text-4xl font-bold mt-1">{completedQuests}/{totalQuests}</h3>
+                <p className="text-xs text-purple-100 mt-1">{Math.round((completedQuests / totalQuests) * 100)}% Complete</p>
+              </div>
+              <div className="text-5xl">🎯</div>
+            </div>
+          </motion.div>
         </motion.div>
 
-        {/* XP Progress Bar */}
+        {/* XP Progress Bar - Compact */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -290,28 +334,28 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
           <XPProgressBar profile={profile} recentXPGain={recentXPGain} />
         </motion.div>
 
-        {/* Quick Actions */}
+        {/* Quick Actions - Compact */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex gap-4"
+          className="flex flex-wrap gap-3"
         >
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowBadges(!showBadges)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-semibold shadow-lg flex items-center gap-2"
+            className="px-5 py-2.5 bg-white border-2 border-purple-300 hover:border-purple-500 text-purple-700 rounded-2xl font-bold shadow-md flex items-center gap-2 transition"
           >
-            <span>🏆</span> {showBadges ? 'Hide' : 'Show'} Badges ({userBadges.length}/{badges.length})
+            <span>🏆</span> Badges ({userBadges.length}/{badges.length})
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowSpin(!showSpin)}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl font-semibold shadow-lg flex items-center gap-2"
+            className="px-5 py-2.5 bg-white border-2 border-blue-300 hover:border-blue-500 text-blue-700 rounded-2xl font-bold shadow-md flex items-center gap-2 transition"
           >
-            <span>🎡</span> {showSpin ? 'Hide' : 'Show'} Daily Spin
+            <span>🎡</span> Daily Spin
           </motion.button>
         </motion.div>
 
@@ -345,59 +389,50 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
           </motion.div>
         )}
 
-        {/* Category Filter */}
+        {/* Section Divider */}
+        <div className="relative py-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t-2 border-gray-200"></div>
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-6 py-2 text-2xl font-bold text-gray-800 rounded-full shadow-md border-2 border-gray-200">
+              ✨ Start Your Adventure ✨
+            </span>
+          </div>
+        </div>
+
+        {/* Category Filter - Cleaner */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="space-y-4"
+          className="space-y-6"
         >
-          <div className="flex items-center justify-between">
-            <h2 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <motion.span
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                🎯
-              </motion.span>
-              Your Quest Journey
-            </h2>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-2xl font-bold shadow-lg"
-            >
-              {filteredQuests.length} {filteredQuests.length === 1 ? 'Quest' : 'Quests'}
-            </motion.div>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category, index) => (
-              <motion.button
-                key={category.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 * index }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`relative px-6 py-3 rounded-2xl font-bold transition-all duration-300 ${
-                  selectedCategory === category.id
-                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/30'
-                    : 'bg-white text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 border-2 border-gray-200 hover:border-gray-300 shadow-md'
-                }`}
-              >
-                <span className="text-xl mr-2">{category.icon}</span>
-                <span>{category.name}</span>
-                {selectedCategory === category.id && (
-                  <motion.div
-                    layoutId="activeCategory"
-                    className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl -z-10"
-                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </motion.button>
-            ))}
+          <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 shadow-lg border-2 border-gray-200">
+            <h3 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+              <span>🎨</span> Choose Your Path
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category, index) => (
+                <motion.button
+                  key={category.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.05 * index }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-all ${
+                    selectedCategory === category.id
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className="mr-2">{category.icon}</span>
+                  {category.name}
+                </motion.button>
+              ))}
+            </div>
           </div>
         </motion.div>
 
