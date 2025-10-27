@@ -22,13 +22,37 @@ export default function LoginPage() {
     "Join thousands on their Finland journey 🚀"
   ]
 
-  const floatingIcons = [
-    { emoji: '🇫🇮', delay: 0, x: -20, y: -30 },
-    { emoji: '⚡', delay: 0.5, x: 30, y: -20 },
-    { emoji: '🎯', delay: 1, x: -30, y: 20 },
-    { emoji: '🏆', delay: 1.5, x: 25, y: 30 },
-    { emoji: '✨', delay: 2, x: -15, y: -40 }
+  const features = [
+    {
+      icon: '🎁',
+      title: 'Unlock Rewards',
+      description: 'Complete quests to earn badges and XP'
+    },
+    {
+      icon: '🏆',
+      title: 'Compete & Win',
+      description: 'Climb the leaderboard and become #1'
+    },
+    {
+      icon: '🎯',
+      title: 'Track Progress',
+      description: 'Monitor your Finnish journey in real-time'
+    },
+    {
+      icon: '✨',
+      title: 'Level Up',
+      description: 'Gain experience and unlock new challenges'
+    }
   ]
+
+  const [currentFeature, setCurrentFeature] = useState(0)
+
+  useEffect(() => {
+    const featureInterval = setInterval(() => {
+      setCurrentFeature((prev) => (prev + 1) % features.length)
+    }, 3500)
+    return () => clearInterval(featureInterval)
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,7 +114,8 @@ export default function LoginPage() {
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"
+            className="text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent pb-2"
+            style={{ lineHeight: '1.2' }}
           >
             Finding Finland
           </motion.h1>
@@ -111,30 +136,50 @@ export default function LoginPage() {
             </AnimatePresence>
           </div>
 
-          {/* Floating Icons */}
-          <div className="relative h-64 hidden lg:block">
-            {floatingIcons.map((icon, index) => (
+          {/* Feature Slideshow */}
+          <div className="relative h-64 hidden lg:block overflow-hidden">
+            <AnimatePresence mode="wait">
               <motion.div
-                key={index}
-                animate={{
-                  y: [icon.y, icon.y - 20, icon.y],
-                  x: [icon.x, icon.x + 10, icon.x],
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: 3 + index,
-                  repeat: Infinity,
-                  delay: icon.delay,
-                }}
-                className="absolute text-6xl"
-                style={{
-                  left: `${50 + icon.x}%`,
-                  top: `${50 + icon.y}%`,
-                }}
+                key={currentFeature}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0 flex items-center justify-center"
               >
-                {icon.emoji}
+                <div className="bg-white/90 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-2 border-gray-200 max-w-md">
+                  <motion.div
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.3, delay: 0.2 }}
+                    className="text-7xl mb-4 text-center"
+                  >
+                    {features[currentFeature].icon}
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+                    {features[currentFeature].title}
+                  </h3>
+                  <p className="text-gray-600 text-center">
+                    {features[currentFeature].description}
+                  </p>
+                </div>
               </motion.div>
-            ))}
+            </AnimatePresence>
+
+            {/* Slideshow Indicators */}
+            <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-2">
+              {features.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentFeature(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentFeature
+                      ? 'bg-blue-600 w-8'
+                      : 'bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* Stats */}
