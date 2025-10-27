@@ -29,6 +29,8 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
   const [recentXPGain, setRecentXPGain] = useState(0)
   const [showBadges, setShowBadges] = useState(false)
   const [showSpin, setShowSpin] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const QUESTS_PER_PAGE = 6
   const router = useRouter()
   const supabase = createClient()
 
@@ -164,6 +166,17 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
     ? quests
     : quests.filter((q) => q.category === selectedCategory)
 
+  // Pagination
+  const totalPages = Math.ceil(filteredQuests.length / QUESTS_PER_PAGE)
+  const startIndex = (currentPage - 1) * QUESTS_PER_PAGE
+  const endIndex = startIndex + QUESTS_PER_PAGE
+  const paginatedQuests = filteredQuests.slice(startIndex, endIndex)
+
+  // Reset to page 1 when category changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory])
+
   const completedQuests = progress.filter((p) => p.completed).length
   const totalQuests = quests.length
 
@@ -222,7 +235,7 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </div>
       </nav>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
         {/* Progress Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -356,19 +369,91 @@ export default function DashboardClient({ profile: initialProfile, quests, progr
         </motion.div>
 
         {/* Quests Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {filteredQuests.map((quest) => {
+        <motion.div
+          key={currentPage}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-2"
+        >
+          {paginatedQuests.map((quest, index) => {
             const questProgress = progress.find((p) => p.quest_id === quest.id)
             return (
-              <QuestCard
+              <motion.div
                 key={quest.id}
-                quest={quest}
-                progress={questProgress}
-                onComplete={handleCompleteQuest}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <QuestCard
+                  quest={quest}
+                  progress={questProgress}
+                  onComplete={handleCompleteQuest}
+                />
+              </motion.div>
             )
           })}
-        </div>
+        </motion.div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center gap-2 mt-12"
+          >
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-6 py-3 bg-white border-2 border-gray-300 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-md"
+            >
+              ← Previous
+            </motion.button>
+
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <motion.button
+                  key={page}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setCurrentPage(page)}
+                  className={`w-12 h-12 rounded-2xl font-bold transition shadow-md ${
+                    currentPage === page
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-white border-2 border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {page}
+                </motion.button>
+              ))}
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="px-6 py-3 bg-white border-2 border-gray-300 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-md"
+            >
+              Next →
+            </motion.button>
+          </motion.div>
+        )}
+
+        {/* Showing X of Y quests indicator */}
+        {filteredQuests.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center mt-4"
+          >
+            <p className="text-gray-600 font-medium">
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredQuests.length)} of {filteredQuests.length} quests
+            </p>
+          </motion.div>
+        )}
 
         {filteredQuests.length === 0 && (
           <motion.div
