@@ -131,12 +131,16 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
     <motion.div
       layout
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      animate={{
+        opacity: isCompleted ? 0.7 : 1,
+        y: 0,
+        scale: isCompleted ? 0.95 : 1
+      }}
       transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
       whileHover={!isCompleted ? { scale: 1.02, y: -4 } : {}}
       className={`relative group rounded-3xl overflow-hidden ${
         isCompleted
-          ? 'bg-gradient-to-br from-emerald-50 to-teal-50'
+          ? 'bg-gradient-to-br from-gray-100 to-gray-200'
           : `bg-gradient-to-br ${config.light}`
       }`}
     >
@@ -170,7 +174,7 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
       </div>
 
       {/* Content */}
-      <div className={`relative border-2 ${isCompleted ? 'border-emerald-300' : config.border} rounded-3xl p-6 backdrop-blur-sm transition-all duration-300 ${
+      <div className={`relative border-2 ${isCompleted ? 'border-gray-300' : config.border} rounded-3xl ${isCompleted ? 'p-4' : 'p-6'} backdrop-blur-sm transition-all duration-300 ${
         !isCompleted && 'group-hover:shadow-2xl group-hover:' + config.glow
       }`}>
 
@@ -179,16 +183,16 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
           <div className="flex items-start gap-4 flex-1">
             {/* Icon */}
             <motion.div
-              whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
+              whileHover={!isCompleted ? { rotate: [0, -10, 10, -10, 0], scale: 1.1 } : {}}
               transition={{ duration: 0.5 }}
-              className={`text-5xl bg-white rounded-2xl p-3 ${config.shadow} shadow-lg`}
+              className={`${isCompleted ? 'text-3xl p-2' : 'text-5xl p-3'} bg-white rounded-2xl ${config.shadow} shadow-lg`}
             >
               {quest.icon}
             </motion.div>
 
             {/* Title and category */}
             <div className="flex-1">
-              <h3 className="font-bold text-xl text-gray-900 mb-2 leading-tight">
+              <h3 className={`font-bold ${isCompleted ? 'text-base' : 'text-xl'} ${isCompleted ? 'text-gray-600' : 'text-gray-900'} mb-2 leading-tight`}>
                 {quest.title}
               </h3>
               <div className="flex items-center gap-2 flex-wrap">
@@ -216,26 +220,28 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
           </div>
 
           {/* Badges */}
-          <div className="flex flex-col gap-2">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className="bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2"
-            >
-              <span className="text-lg">⚡</span>
-              <span>+{quest.xp} XP</span>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: -5 }}
-              className="bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-orange-500/30 flex items-center gap-2"
-            >
-              <span className="text-lg">🏆</span>
-              <span>+{quest.points}</span>
-            </motion.div>
-          </div>
+          {!isCompleted && (
+            <div className="flex flex-col gap-2">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                className="bg-gradient-to-br from-cyan-400 via-blue-500 to-blue-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-blue-500/30 flex items-center gap-2"
+              >
+                <span className="text-lg">⚡</span>
+                <span>+{quest.xp} XP</span>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: -5 }}
+                className="bg-gradient-to-br from-amber-400 via-orange-500 to-orange-600 text-white font-bold px-4 py-2 rounded-2xl text-sm shadow-lg shadow-orange-500/30 flex items-center gap-2"
+              >
+                <span className="text-lg">🏆</span>
+                <span>+{quest.points}</span>
+              </motion.div>
+            </div>
+          )}
         </div>
 
         {/* Description */}
-        <p className="text-gray-700 mb-4 leading-relaxed">{quest.description}</p>
+        <p className={`${isCompleted ? 'text-gray-500 text-sm' : 'text-gray-700'} mb-4 leading-relaxed`}>{quest.description}</p>
 
         {/* Region Tag */}
         {quest.region && !isCompleted && (
@@ -276,10 +282,10 @@ export default function QuestCard({ quest, progress, onComplete }: QuestCardProp
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold py-4 px-6 rounded-2xl shadow-lg"
+            className="flex items-center justify-center gap-2 bg-gray-400 text-white font-semibold py-2 px-4 rounded-xl text-sm"
           >
-            <span className="text-2xl">✅</span>
-            <span>COMPLETED!</span>
+            <span className="text-lg">✅</span>
+            <span>Completed</span>
           </motion.div>
         )}
 
