@@ -12,8 +12,18 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [taglineIndex, setTaglineIndex] = useState(0)
+  const [scrollWordIndex, setScrollWordIndex] = useState(0)
   const router = useRouter()
   const supabase = createClient()
+
+  const scrollingWords = [
+    'Finland',
+    'Your Dream',
+    'Success',
+    'Adventure',
+    'Community',
+    'Your Path'
+  ]
 
   const taglines = [
     "Your gamified guide to Finnish life 🇫🇮",
@@ -21,6 +31,13 @@ export default function LoginPage() {
     "Master Finnish culture step by step 🎯",
     "Join thousands on their Finland journey 🚀"
   ]
+
+  useEffect(() => {
+    const scrollInterval = setInterval(() => {
+      setScrollWordIndex((prev) => (prev + 1) % scrollingWords.length)
+    }, 2500)
+    return () => clearInterval(scrollInterval)
+  }, [])
 
   const features = [
     {
@@ -111,14 +128,33 @@ export default function LoginPage() {
           transition={{ duration: 0.8 }}
           className="text-center lg:text-left space-y-8 relative"
         >
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-6xl lg:text-7xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent pb-2"
-            style={{ lineHeight: '1.2' }}
-          >
-            Finding Finland
-          </motion.h1>
+          {/* Scrolling Title */}
+          <div className="relative overflow-hidden pb-2">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-6xl lg:text-7xl font-bold flex items-baseline gap-4"
+              style={{ lineHeight: '1.2' }}
+            >
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Finding
+              </span>
+              <div className="relative h-[1.2em] overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={scrollWordIndex}
+                    initial={{ y: '100%', opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: '-100%', opacity: 0 }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                    className="absolute left-0 top-0 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent whitespace-nowrap"
+                  >
+                    {scrollingWords[scrollWordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+            </motion.h1>
+          </div>
 
           {/* Rotating Taglines */}
           <div className="h-16">
