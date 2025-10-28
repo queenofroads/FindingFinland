@@ -129,32 +129,31 @@ export default function LoginPage() {
           className="text-center lg:text-left space-y-8 relative"
         >
           {/* Scrolling Title */}
-          <div className="relative overflow-hidden pb-2">
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-6xl lg:text-7xl font-bold flex items-baseline gap-4"
-              style={{ lineHeight: '1.2' }}
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="pb-2"
+          >
+            <h1 className="text-6xl lg:text-7xl font-bold flex flex-wrap lg:flex-nowrap items-center gap-3 lg:gap-4">
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Finding
               </span>
-              <div className="relative h-[1.2em] overflow-hidden">
+              <span className="relative inline-block min-w-[280px] lg:min-w-[350px] h-[72px] lg:h-[84px] overflow-hidden">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={scrollWordIndex}
-                    initial={{ y: '100%', opacity: 0 }}
+                    initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: '-100%', opacity: 0 }}
+                    exit={{ y: -100, opacity: 0 }}
                     transition={{ duration: 0.5, ease: 'easeInOut' }}
-                    className="absolute left-0 top-0 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent whitespace-nowrap"
+                    className="absolute left-0 top-0 bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 bg-clip-text text-transparent"
                   >
                     {scrollingWords[scrollWordIndex]}
                   </motion.span>
                 </AnimatePresence>
-              </div>
-            </motion.h1>
-          </div>
+              </span>
+            </h1>
+          </motion.div>
 
           {/* Rotating Taglines */}
           <div className="h-16">
